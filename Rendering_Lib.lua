@@ -11,15 +11,14 @@
 ---@field color table
 BaseShape = {
     ---@param self BaseShape
-    ---@param _id number
     ---@param _position LBVec
     ---@param _rotation number
     ---@param _width number
     ---@param _height number
     ---@return BaseShape
-    new = function(self, _id, _position, _rotation, _width, _height)
+    new = function(self, _position, _rotation, _width, _height)
         return LifeBoatAPI.lb_copy(self, {
-            id = _id,
+            id = nil,
             position = LifeBoatAPI.LBVec:new(LifeBoatAPI.LBMaths.lbmaths_round(_position.x), LifeBoatAPI.LBMaths.lbmaths_round(_position.y)),
             rotation = _rotation,
             width = _width,
@@ -44,13 +43,12 @@ BaseShape = {
 ---@field doFill boolean
 Polygon = LifeBoatAPI.lb_copy(BaseShape, {
     ---@param self Polygon
-    ---@param _id number
     ---@param _position LBVec
     ---@param _rotation number
     ---@param _vertices table
     ---@param _doFill boolean
     ---@return Polygon
-    new = function(self, _id, _position, _rotation, _vertices, _doFill)
+    new = function(self, _position, _rotation, _vertices, _doFill)
         local minX, maxX, minY, maxY = math.huge, -math.huge, math.huge, -math.huge
         for _, v in ipairs(_vertices) do
             minX, maxX = math.min(minX, v.x), math.max(maxX, v.x)
@@ -59,7 +57,7 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
 
         local width = maxX - minX
         local height = maxY - minY
-        local obj = BaseShape.new(self, _id, _position, _rotation, width, height)
+        local obj = BaseShape.new(self, _position, _rotation, width, height)
         obj.vertices = _vertices -- Store local (unrotated) vertices
         obj.doFill = _doFill
         return obj
@@ -123,14 +121,13 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
 ---@field doFill boolean
 RotatedRectangle = {
     ---@param self RotatedRectangle
-    ---@param _id number
     ---@param _position LBVec
     ---@param _rotation number
     ---@param _width number
     ---@param _height number
     ---@param _doFill boolean
     ---@return RotatedRectangle
-    new = function(self, _id, _position, _rotation, _width, _height, _doFill)
+    new = function(self, _position, _rotation, _width, _height, _doFill)
         local corners = {
             LifeBoatAPI.LBVec:new(-(_width / 2), -(_height / 2)), -- Top-left
             LifeBoatAPI.LBVec:new((_width / 2), -(_height / 2)),  -- Top-right
@@ -138,15 +135,15 @@ RotatedRectangle = {
             LifeBoatAPI.LBVec:new(-(_width / 2), (_height / 2)),  -- Bottom-left
         }
 
-        local obj = BaseShape.new(self, _id, _position, _rotation, _width, _height)
+        local obj = BaseShape.new(self, _position, _rotation, _width, _height)
         obj.doFill = _doFill
         obj.corners = corners
 
         if _doFill then
             -- Create triangles (polygons) for a filled rectangle
             obj.polygons = {
-                Polygon:new(_id, _position, _rotation, { corners[1], corners[2], corners[4] }, _doFill),
-                Polygon:new(_id, _position, _rotation, { corners[4], corners[3], corners[2] }, _doFill),
+                Polygon:new(_position, _rotation, { corners[1], corners[2], corners[4] }, _doFill),
+                Polygon:new(_position, _rotation, { corners[4], corners[3], corners[2] }, _doFill),
             }
         else
             -- No polygons needed for an unfilled rectangle
@@ -212,14 +209,13 @@ RotatedRectangle = {
 ---@field doFill boolean
 CircleShape = LifeBoatAPI.lb_copy(BaseShape, {
     ---@param self CircleShape
-    ---@param _id number
     ---@param _position LBVec
     ---@param _rotation number
     ---@param _radius number
     ---@param _doFill boolean
     ---@return CircleShape
-    new = function(self, _id, _position, _rotation, _radius, _doFill)
-        local obj = BaseShape.new(self, _id, _position, _rotation, 2*_radius, 2*_radius)
+    new = function(self, _position, _rotation, _radius, _doFill)
+        local obj = BaseShape.new(self, _position, _rotation, 2*_radius, 2*_radius)
         obj.radius = _radius
         obj.doFill = _doFill
         return obj

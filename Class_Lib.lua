@@ -59,6 +59,7 @@ BaseObject = {
     ---@param self BaseObject
     ---@param shape BaseShape
     AddShape = function(self, shape)
+        shape.id = #self.shapes
         table.insert(self.shapes, shape)
     end;
     ---@endsection
