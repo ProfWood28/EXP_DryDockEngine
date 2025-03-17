@@ -1,6 +1,6 @@
 require("LifeBoatAPI")
 
-require("Class_Lib")
-require("Physics_Lib")
-require("Engine_Lib")
-require("Rendering_Lib")
+require("ProfWood28.DryDockEngine.Class_Lib")
+require("ProfWood28.DryDockEngine.Physics_Lib")
+require("ProfWood28.DryDockEngine.Engine_Lib")
+require("ProfWood28.DryDockEngine.Rendering_Lib")
