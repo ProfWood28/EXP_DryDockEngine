@@ -5,12 +5,13 @@ The Dry Dock Engine is a class-based 2D game engine library.
 
 It is made with for use in combination with the LifeBoatAPI and the Stormworks Lua VSCode Extension by [@nameouschangey](https://github.com/nameouschangey).
 
+
 You can add libraries to the extension via GitHub link. 
 Simply right-click your folders, and then select 'Stormworks: Add Library From Url'. Now copy-paste this into the textbox that shows up:
 ```
 https://github.com/ProfWood28/DryDockEngine.git
 ```
-If all went well, you should now have the library! You should be able to find it under `_build\libs\ProfWood28\DryDockEngine`.
+If all went well, you should now have the library! You should be able to find it under: `_build\libs\ProfWood28\DryDockEngine`.
 When you want to use the engine, simply add the filepath in a `require()` as follows:
 ```lua
 -- This assumes that you used the 'Add Library From Url'
@@ -20,6 +21,10 @@ require("ProfWood28.DryDockEngine.DryDockEngine")
 -- You can also add only parts of the whole library like this:
 require("ProfWood28.DryDockEngine.Class_Lib")
 ```
+
+If needed, outside restarting the editor, you can also always update the library from the same right-click menu as where you found 'Add Library From Url'. 
+It will be called 'Stormworks: Update Libraries', and after clicking it, you should be up-to-date with the latest version.
+
 
 Active work is being done, and some features are very much not working/inefficient/weirdly done/incomplete. 
 This is very much still a WIP.
