@@ -3,13 +3,22 @@
 
 The Dry Dock Engine is a class-based 2D game engine library.
 
-It is made with for use in combination with the LifeBoatAPI and the Stormworks Lua VSCode Extension by @nameouschangey.
+It is made with for use in combination with the LifeBoatAPI and the Stormworks Lua VSCode Extension by [@nameouschangey](https://github.com/nameouschangey).
 
-You must clone the git to use it, as I cannot figure out how the 'Add Library From Url' command works.
-Then simply add the filepath in a `require()` as follows:
+You can add libraries to the extension via GitHub link. 
+Simply right-click your folders, and then select 'Stormworks: Add Library From Url'. Now copy-paste this into the textbox that shows up:
+```
+https://github.com/ProfWood28/DryDockEngine.git
+```
+If all went well, you should now have the library! You should be able to find it under `_build\libs\ProfWood28\DryDockEngine`.
+When you want to use the engine, simply add the filepath in a `require()` as follows:
 ```lua
---'Folder' here is your file path
-require("Folder.DryDockEngine")
+-- This assumes that you used the 'Add Library From Url'
+-- It will add the entire engine, though rest assured, it strips anything you do not use
+require("ProfWood28.DryDockEngine.DryDockEngine")
+
+-- You can also add only parts of the whole library like this:
+require("ProfWood28.DryDockEngine.Class_Lib")
 ```
 
 Active work is being done, and some features are very much not working/inefficient/weirdly done/incomplete. 
@@ -47,7 +56,7 @@ AddGameObject(object)
 
 -- The object currently does not have anything to render, so add a shape to it:
 -- Create new shape, in this case a filled rectangle with some basic parameters
-rect = RotatedRectangle:new(object.id, object.position, object.rotation, object.width, object.height, true)
+rect = RotatedRectangle:new(object.position, object.rotation, object.width, object.height, true)
 -- Add it to the object
 object:AddShape(rect)
 
@@ -63,4 +72,3 @@ function onDraw()
     DoDraw()
 end
 ```
-
