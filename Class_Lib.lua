@@ -64,12 +64,26 @@ BaseObject = {
     end;
     ---@endsection
     
+    ---@section RemoveShape
+    ---@param self BaseObject
+    ---@param shape BaseShape
+    RemoveShape = function(self, shape)
+        table.remove(self.shapes, shape.id+1)
+    end;
+    ---@endsection
+    
     ---@section SetColor
     ---@param self BaseShape
     ---@param color table
-    SetColor = function (self, color)
+    ---@param id number
+    SetColor = function (self, color, id)
+        id = id or nil
         for _, shape in ipairs(self.shapes) do
-            shape.color = color
+            if id ~= nil then
+                shape.color = (shape.id == id) and color
+            else
+                shape.color = color
+            end
         end
     end
 }

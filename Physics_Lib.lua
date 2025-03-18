@@ -47,3 +47,13 @@ function SimpleCollision(objectA, objectB)
     return areColliding
 end
 ---@endsection
+
+---@section AdvancedCollision
+---@param objectA BaseObject
+---@param ObjectB BaseObject
+---@return boolean, number
+function AdvancedCollision(objectA, ObjectB)
+    local penDepth = 0
+    print(objectA.type) 
+    return false, penDepth
+end
