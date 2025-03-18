@@ -9,6 +9,7 @@
 ---@field width number
 ---@field height number
 ---@field color table
+---@field type string
 BaseShape = {
     ---@param self BaseShape
     ---@param _position LBVec
@@ -24,6 +25,7 @@ BaseShape = {
             width = _width,
             height = _height,
             color = {255, 255, 255, 255},
+            type = "BaseShape",
         })
     end;
 
@@ -41,6 +43,7 @@ BaseShape = {
 ---@class Polygon : BaseShape
 ---@field vertices table
 ---@field doFill boolean
+---@field type string
 Polygon = LifeBoatAPI.lb_copy(BaseShape, {
     ---@param self Polygon
     ---@param _position LBVec
@@ -60,6 +63,7 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
         local obj = BaseShape.new(self, _position, _rotation, width, height)
         obj.vertices = _vertices -- Store local (unrotated) vertices
         obj.doFill = _doFill
+        obj.type = "Polygon"
         return obj
     end;
 
@@ -119,6 +123,7 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
 ---@field corners table
 ---@field polygons table
 ---@field doFill boolean
+---@field type string
 RotatedRectangle = {
     ---@param self RotatedRectangle
     ---@param _position LBVec
@@ -150,6 +155,7 @@ RotatedRectangle = {
             obj.polygons = nil
         end
 
+        obj.type = "RotatedRectangle"
         return obj
     end;
 
@@ -207,6 +213,7 @@ RotatedRectangle = {
 ---@class CircleShape : BaseShape
 ---@field radius number
 ---@field doFill boolean
+---@field type string
 CircleShape = LifeBoatAPI.lb_copy(BaseShape, {
     ---@param self CircleShape
     ---@param _position LBVec
@@ -218,6 +225,7 @@ CircleShape = LifeBoatAPI.lb_copy(BaseShape, {
         local obj = BaseShape.new(self, _position, _rotation, 2*_radius, 2*_radius)
         obj.radius = _radius
         obj.doFill = _doFill
+        obj.type = "CircleShape"
         return obj
     end;
 

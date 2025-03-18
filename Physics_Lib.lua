@@ -51,9 +51,10 @@ end
 ---@section AdvancedCollision
 ---@param objectA BaseObject
 ---@param ObjectB BaseObject
----@return boolean, number
+---@return LBVec, number
 function AdvancedCollision(objectA, ObjectB)
     local penDepth = 0
+    local normal = LifeBoatAPI.LBVec:new()
     print(objectA.type) 
-    return false, penDepth
+    return normal, penDepth
 end

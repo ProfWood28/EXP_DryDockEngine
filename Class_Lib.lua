@@ -7,6 +7,7 @@
 ---@field name string
 ---@field id number
 ---@field shapes table
+---@field type string
 BaseObject = {
     ---@param self BaseObject
     ---@param _position LBVec
@@ -23,7 +24,8 @@ BaseObject = {
             height = _height or 0,
             name = _name or "",
             id = nil, -- ID will be assigned by the engine
-            shapes = {}
+            shapes = {},
+            type = "BaseObject",
         })
     end;
 
@@ -59,7 +61,7 @@ BaseObject = {
     ---@param self BaseObject
     ---@param shape BaseShape
     AddShape = function(self, shape)
-        shape.id = #self.shapes
+        shape.id = #self.shapes + 1
         table.insert(self.shapes, shape)
     end;
     ---@endsection
@@ -68,7 +70,7 @@ BaseObject = {
     ---@param self BaseObject
     ---@param shape BaseShape
     RemoveShape = function(self, shape)
-        table.remove(self.shapes, shape.id+1)
+        table.remove(self.shapes, shape.id)
     end;
     ---@endsection
     
@@ -93,6 +95,7 @@ BaseObject = {
 ---@class PhysicsObject : BaseObject
 ---@field mass number
 ---@field velocity LBVec
+---@field type string
 PhysicsObject = LifeBoatAPI.lb_copy(BaseObject, {
     ---@param self PhysicsObject
     ---@param _position LBVec
@@ -106,6 +109,7 @@ PhysicsObject = LifeBoatAPI.lb_copy(BaseObject, {
         local obj = BaseObject.new(self, _position, _rotation, _width, _height, _name)
         obj.mass = _mass or 1
         obj.velocity = LifeBoatAPI.LBVec:new()
+        obj.type = "PhysicsObject"
         return obj
     end;
 
