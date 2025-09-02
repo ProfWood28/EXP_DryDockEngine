@@ -92,22 +92,6 @@ BaseShape = {
 ---@field type string
 ---@field vertices table
 Polygon = LifeBoatAPI.lb_copy(BaseShape, {
-    ---@param self Polygon
-    ---@param _position LBVec
-    ---@param _rotation number
-    ---@param _scale number
-    ---@param _vertices table
-    ---@param _doFill boolean
-    ---@return Polygon
-    new = function(self, _position, _rotation, _scale, _vertices, _doFill)
-        local obj = BaseShape.new(self, _position, _rotation, _scale)
-        local vertices = Polygon.SortVertices(_vertices)
-        obj.vertices = vertices
-        obj.doFill = _doFill
-        obj.type = ShapeTypes.Polygon
-        return obj
-    end;
-
     ---@section SortVertices
     ---@param self Polygon
     ---@param vertices table 
@@ -153,6 +137,21 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
     end;
     ---@endsection
 
+    ---@param self Polygon
+    ---@param _position LBVec
+    ---@param _rotation number
+    ---@param _scale number
+    ---@param _vertices table
+    ---@param _doFill boolean
+    ---@return Polygon
+    new = function(self, _position, _rotation, _scale, _vertices, _doFill)
+        local obj = BaseShape.new(self, _position, _rotation, _scale)
+        local vertices = Polygon.SortVertices(_vertices)
+        obj.vertices = vertices
+        obj.doFill = _doFill
+        obj.type = ShapeTypes.Polygon
+        return obj
+    end;
 
     ---@section Triangulate
     ---@param self Polygon
