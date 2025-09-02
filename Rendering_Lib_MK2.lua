@@ -68,7 +68,7 @@ BaseShape = {
     ---@section GetAABB
     ---@param self BaseShape
     ---@return table
-    getAABB = function(self)
+    GetAABB = function(self)
         return {minX=self.position.x, maxX=self.position.x,
                 minY=self.position.y, maxY=self.position.y}
     end;
@@ -91,6 +91,7 @@ BaseShape = {
 ---@field color table
 ---@field type string
 ---@field vertices table
+---@field worldVertices table
 Polygon = LifeBoatAPI.lb_copy(BaseShape, {
     ---@section SortVertices
     ---@param self Polygon
@@ -116,7 +117,7 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
 
         local sorted = {}
         for i, pair in ipairs(angleVertices) do
-            sorted[i] = pair.vertex
+            sorted[i] = LifeBoatAPI.LBVec:new(pair.vertex.x, pair.vertex.y)
         end
 
         local finalVertices = {}
@@ -146,8 +147,8 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
     ---@return Polygon
     new = function(self, _position, _rotation, _scale, _vertices, _doFill)
         local obj = BaseShape.new(self, _position, _rotation, _scale)
-        local vertices = Polygon.SortVertices(_vertices)
-        obj.vertices = vertices
+        obj.vertices = Polygon:SortVertices(_vertices)
+        obj.worldVertices = obj.vertices
         obj.doFill = _doFill
         obj.type = ShapeTypes.Polygon
         return obj
@@ -174,8 +175,8 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
     ---@return table
     GetScaledVertices = function (self, vertices)
         local scaledVertices = {}
-        for i, vertice in ipairs(vertices) do
-            scaledVertices[i] = vertice:lbvec_scale(self.scale)
+        for i, v in ipairs(vertices) do
+            scaledVertices[i] = v:lbvec_scale(self.scale)
         end
         return scaledVertices
     end;
@@ -208,25 +209,50 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
         return transformedVerices
     end;
     ---@endsection
+    
+    ---@section GetAABB
+    ---@param self Polygon
+    ---@return table
+    GetAABB = function (self)
+        local verts = self.worldVertices
+        local minX, minY = verts[1].x, verts[1].y
+        local maxX, maxY = verts[1].x, verts[1].y
+
+        for i = 2, #verts do
+            local v = verts[i]
+            if v.x < minX then minX = v.x end
+            if v.x > maxX then maxX = v.x end
+            if v.y < minY then minY = v.y end
+            if v.y > maxY then maxY = v.y end
+        end
+
+        return {
+            minX = minX, maxX = maxX,
+            minY = minY, maxY = maxY,
+            width = maxX - minX,
+            height = maxY - minY,
+            center = LifeBoatAPI.LBVec:new((minX+maxX)/2, (minY+maxY)/2)
+        }
+    end;
+    ---@endsection
 
     ---@section Draw
     ---@param self Polygon
     Draw = function (self)
-        local modifiedVertices = self.GetTransformedVertices(self.GetRotatedVertices(self.GetScaledVertices(self.vertices)))
-        
+        self.worldVertices = self:GetTransformedVertices(self:GetRotatedVertices(self:GetScaledVertices(self.vertices)))
         screen.setColor(self.color[1], self.color[2], self.color[3], self.color[4])
 
         if self.doFill then 
-            local triangles = self.Triangulate(modifiedVertices)
+            local triangles = self:Triangulate(self.worldVertices)
             for _, triangle in ipairs(triangles) do
-                screen.drawTriangleF(triangle[1], triangle[2], triangle[3])
+                screen.drawTriangleF(triangle[1].x, triangle[1].y, triangle[2].x, triangle[2].y, triangle[3].x, triangle[3].y)
             end
         else
-            for i = 1, #modifiedVertices-1 do
-                local v1, v2 = modifiedVertices[i], modifiedVertices[i+1]
+            for i = 1, #self.worldVertices-1 do
+                local v1, v2 = self.worldVertices[i], self.worldVertices[i+1]
                 screen.drawLine(v1.x, v1.y, v2.x, v2.y)
             end
-            local v1, v2 = modifiedVertices[#modifiedVertices], modifiedVertices[1]
+            local v1, v2 = self.worldVertices[#self.worldVertices], self.worldVertices[1]
             screen.drawLine(v1.x, v1.y, v2.x, v2.y)
         end
     end;

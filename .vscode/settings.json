@@ -1,9 +1,9 @@
 {
     "Lua.workspace.library": [
-        "c:/Stormworks LUA/DryDockEngine/",
+        "c:/Stormworks LUA/EXP_DryDockEngine/",
         "c:/Users/dante/.vscode/extensions/nameouschangey.lifeboatapi-0.0.33/assets/lua/Common/",
         "c:/Users/dante/.vscode/extensions/nameouschangey.lifeboatapi-0.0.33/assets/lua/Microcontroller/",
-        "c:/Stormworks LUA/DryDockEngine/_build/libs/"
+        "c:/Stormworks LUA/EXP_DryDockEngine/_build/libs/"
     ],
     "lifeboatapi.stormworks.libs.gitLibraries": [
         {
