@@ -1,9 +1,13 @@
+ObjectTypes = {
+    Base = "BaseObject",
+    Physics = "PhysicsObject",
+}
+
 ---@section BaseObject 1 _BASEOBJECT_
 ---@class BaseObject
 ---@field position LBVec
 ---@field rotation number
----@field width number
----@field height number
+---@field scale number
 ---@field name string
 ---@field id number
 ---@field shapes table
@@ -16,28 +20,17 @@ BaseObject = {
     ---@param _height number
     ---@param _name string
     ---@return BaseObject
-    new = function(self, _position, _rotation, _width, _height, _name)
+    new = function(self, _position, _rotation, _scale, _name)
         return LifeBoatAPI.lb_copy(self, {
             position = _position or LifeBoatAPI.LBVec:new(),
             rotation = _rotation or 0,
-            width = _width or 0,
-            height = _height or 0,
+            scale = _scale or 1,
             name = _name or "",
             id = nil, -- ID will be assigned by the engine
             shapes = {},
-            type = "BaseObject",
+            type = ObjectTypes.Base,
         })
     end;
-
-    ---@section GetForwards
-    ---@param self BaseObject
-    ---@param forwardsOffset number
-    ---@return LBVec ForwardVector Returns the normalised forwards vector based on rotation and offset
-    GetForwards = function(self, forwardsOffset)
-        forwardOffset = forwardOffset or 0
-        return LifeBoatAPI.LBVec:new(math.cos(self.rotation + forwardsOffset), math.sin(self.rotation + forwardsOffset))
-    end;
-    ---@endsection
     
     ---@section Update
     ---@param self BaseObject
@@ -87,7 +80,43 @@ BaseObject = {
                 shape.color = color
             end
         end
-    end
+    end;
+    
+    ---@section SetPosition
+    ---@param self BaseShape
+    ---@param vector LBVec
+    SetPosition = function (self, vector)
+        self.position = vector
+    end;
+    ---@endsection
+    
+    ---@section SetRotation
+    ---@param self BaseShape
+    ---@param angle number
+    SetRotation = function (self, angle)
+        self.rotation = angle
+    end;
+    ---@endsection
+    
+    ---@endsection
+    ---@section SetScale
+    ---@param self BaseShape
+    ---@param s number
+    SetScale = function (self, s)
+        self.scale = s
+    end;
+    ---@endsection
+
+    ---@section GetForwards
+    ---@param self BaseObject
+    ---@param forwardsOffset number
+    ---@return LBVec ForwardVector Returns the normalised forwards vector based on rotation and offset
+    getForwards = function(self, forwardsOffset)
+        forwardOffset = forwardOffset or 0
+        return LifeBoatAPI.LBVec:new(math.cos(self.rotation + forwardsOffset), math.sin(self.rotation + forwardsOffset))
+    end;
+    ---@endsection
+
 }
 ---@endsection _BASEOBJECT_
 
@@ -100,16 +129,15 @@ PhysicsObject = LifeBoatAPI.lb_copy(BaseObject, {
     ---@param self PhysicsObject
     ---@param _position LBVec
     ---@param _rotation number
-    ---@param _width number
-    ---@param _height number
+    ---@param _scale number
     ---@param _name string
     ---@param _mass number
     ---@return PhysicsObject
-    new = function(self, _position, _rotation, _width, _height, _name, _mass)
-        local obj = BaseObject.new(self, _position, _rotation, _width, _height, _name)
+    new = function(self, _position, _rotation, _scale, _name, _mass)
+        local obj = BaseObject.new(self, _position, _rotation, _scale, _name)
         obj.mass = _mass or 1
         obj.velocity = LifeBoatAPI.LBVec:new()
-        obj.type = "PhysicsObject"
+        obj.type = ObjectTypes.Physics
         return obj
     end;
 
@@ -130,6 +158,9 @@ PhysicsObject = LifeBoatAPI.lb_copy(BaseObject, {
         
         -- Returns both the penetration depth and object it collided with
         -- nil if no collision
+
+        -- TBA!!!
+        return nil, nil
     end
     ---@endsection
 })

@@ -114,6 +114,20 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
         )
     end;
     ---@endsection
+    
+    ---@section GetCentroid
+    ---@param self
+    ---@return LBVec
+    GetCentroid = function (self)
+        local sumX, sumY = 0, 0
+        for _, v in ipairs(self.vertices) do
+            sumX = sumX + v.x
+            sumY = sumY + v.y
+        end
+
+        return LifeBoatAPI.LBVec:new(sumX / #self.vertices, sumY / #self.vertices)
+    end
+    ---@endsection
 })
 ---@endsection _POLYGON_
 
@@ -186,14 +200,7 @@ RotatedRectangle = {
             end
         else
             -- If filling is disabled, draw lines between corners
-            local rotatedCorners = {}
-
-            -- Rotate and translate corners
-            for _, corner in ipairs(self.corners) do
-                local rotatedX = corner.x * math.cos(self.rotation) - corner.y * math.sin(self.rotation) + self.position.x
-                local rotatedY = corner.x * math.sin(self.rotation) + corner.y * math.cos(self.rotation) + self.position.y
-                table.insert(rotatedCorners, LifeBoatAPI.LBVec:new(rotatedX, rotatedY))
-            end
+            local rotatedCorners = self:GetRotatedCorners()
 
             -- Draw the outline by connecting corners
             for i = 1, #rotatedCorners do
@@ -203,6 +210,23 @@ RotatedRectangle = {
             end
         end
     end;
+    ---@endsection
+    
+    ---@section GetRotatedCorners
+    ---@param self RotatedRectangle
+    ---@return table
+    GetRotatedCorners = function(self)
+        local rotatedCorners = {}
+
+        -- Rotate and translate corners
+        for _, corner in ipairs(self.corners) do
+            local rotatedX = corner.x * math.cos(self.rotation) - corner.y * math.sin(self.rotation) + self.position.x
+            local rotatedY = corner.x * math.sin(self.rotation) + corner.y * math.cos(self.rotation) + self.position.y
+            table.insert(rotatedCorners, LifeBoatAPI.LBVec:new(rotatedX, rotatedY))
+        end
+
+        return rotatedCorners
+    end
     ---@endsection
 
 }
