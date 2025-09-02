@@ -9,6 +9,7 @@
 ---@field width number
 ---@field height number
 ---@field color table
+---@field type string
 BaseShape = {
     ---@param self BaseShape
     ---@param _position LBVec
@@ -24,6 +25,7 @@ BaseShape = {
             width = _width,
             height = _height,
             color = {255, 255, 255, 255},
+            type = "BaseShape",
         })
     end;
 
@@ -41,6 +43,7 @@ BaseShape = {
 ---@class Polygon : BaseShape
 ---@field vertices table
 ---@field doFill boolean
+---@field type string
 Polygon = LifeBoatAPI.lb_copy(BaseShape, {
     ---@param self Polygon
     ---@param _position LBVec
@@ -60,6 +63,7 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
         local obj = BaseShape.new(self, _position, _rotation, width, height)
         obj.vertices = _vertices -- Store local (unrotated) vertices
         obj.doFill = _doFill
+        obj.type = "Polygon"
         return obj
     end;
 
@@ -110,6 +114,20 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
         )
     end;
     ---@endsection
+    
+    ---@section GetCentroid
+    ---@param self
+    ---@return LBVec
+    GetCentroid = function (self)
+        local sumX, sumY = 0, 0
+        for _, v in ipairs(self.vertices) do
+            sumX = sumX + v.x
+            sumY = sumY + v.y
+        end
+
+        return LifeBoatAPI.LBVec:new(sumX / #self.vertices, sumY / #self.vertices)
+    end
+    ---@endsection
 })
 ---@endsection _POLYGON_
 
@@ -119,6 +137,7 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
 ---@field corners table
 ---@field polygons table
 ---@field doFill boolean
+---@field type string
 RotatedRectangle = {
     ---@param self RotatedRectangle
     ---@param _position LBVec
@@ -150,6 +169,7 @@ RotatedRectangle = {
             obj.polygons = nil
         end
 
+        obj.type = "RotatedRectangle"
         return obj
     end;
 
@@ -180,14 +200,7 @@ RotatedRectangle = {
             end
         else
             -- If filling is disabled, draw lines between corners
-            local rotatedCorners = {}
-
-            -- Rotate and translate corners
-            for _, corner in ipairs(self.corners) do
-                local rotatedX = corner.x * math.cos(self.rotation) - corner.y * math.sin(self.rotation) + self.position.x
-                local rotatedY = corner.x * math.sin(self.rotation) + corner.y * math.cos(self.rotation) + self.position.y
-                table.insert(rotatedCorners, LifeBoatAPI.LBVec:new(rotatedX, rotatedY))
-            end
+            local rotatedCorners = self:GetRotatedCorners()
 
             -- Draw the outline by connecting corners
             for i = 1, #rotatedCorners do
@@ -198,6 +211,23 @@ RotatedRectangle = {
         end
     end;
     ---@endsection
+    
+    ---@section GetRotatedCorners
+    ---@param self RotatedRectangle
+    ---@return table
+    GetRotatedCorners = function(self)
+        local rotatedCorners = {}
+
+        -- Rotate and translate corners
+        for _, corner in ipairs(self.corners) do
+            local rotatedX = corner.x * math.cos(self.rotation) - corner.y * math.sin(self.rotation) + self.position.x
+            local rotatedY = corner.x * math.sin(self.rotation) + corner.y * math.cos(self.rotation) + self.position.y
+            table.insert(rotatedCorners, LifeBoatAPI.LBVec:new(rotatedX, rotatedY))
+        end
+
+        return rotatedCorners
+    end
+    ---@endsection
 
 }
 ---@endsection _ROTATEDRECTANGLE_
@@ -207,6 +237,7 @@ RotatedRectangle = {
 ---@class CircleShape : BaseShape
 ---@field radius number
 ---@field doFill boolean
+---@field type string
 CircleShape = LifeBoatAPI.lb_copy(BaseShape, {
     ---@param self CircleShape
     ---@param _position LBVec
@@ -218,6 +249,7 @@ CircleShape = LifeBoatAPI.lb_copy(BaseShape, {
         local obj = BaseShape.new(self, _position, _rotation, 2*_radius, 2*_radius)
         obj.radius = _radius
         obj.doFill = _doFill
+        obj.type = "CircleShape"
         return obj
     end;
 

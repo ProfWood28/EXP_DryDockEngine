@@ -1,0 +1,14 @@
+{
+    "Lua.workspace.library": [
+        "c:/Stormworks LUA/DryDockEngine/",
+        "c:/Users/dante/.vscode/extensions/nameouschangey.lifeboatapi-0.0.33/assets/lua/Common/",
+        "c:/Users/dante/.vscode/extensions/nameouschangey.lifeboatapi-0.0.33/assets/lua/Microcontroller/",
+        "c:/Stormworks LUA/DryDockEngine/_build/libs/"
+    ],
+    "lifeboatapi.stormworks.libs.gitLibraries": [
+        {
+            "name": "LifeBoatAPI",
+            "gitUrl": "https://github.com/nameouschangey/Stormworks_LifeBoatAPI_MC.git"
+        }
+    ]
+}
