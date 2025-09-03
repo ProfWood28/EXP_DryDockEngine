@@ -185,15 +185,15 @@ PolygonCircle = function(polygon, circle)
 
     -- Step 2: Axis from closest polygon vertex to circle center
     local closestVertex = polygon.vertices[1]
-    local minDist = circle.position:lbvec_sub(closestVertex):lbvec_length()
+    local minDist = circle.center:lbvec_sub(closestVertex):lbvec_length()
     for i = 2, #polygon.vertices do
-        local dist = circle.position:lbvec_sub(polygon.vertices[i]):lbvec_length()
+        local dist = circle.center:lbvec_sub(polygon.vertices[i]):lbvec_length()
         if dist < minDist then
             minDist = dist
             closestVertex = polygon.vertices[i]
         end
     end
-    local axisToCircle = circle.position:lbvec_sub(closestVertex)
+    local axisToCircle = circle.center:lbvec_sub(closestVertex)
     if axisToCircle:lbvec_length() > 0 then
         table.insert(axes, axisToCircle:lbvec_normalize())
     end
