@@ -28,23 +28,21 @@ function DragForce(velocity, drag)
 end
 ---@endsection
 
----@section SimpleCollision
----@param objectA BaseObject
----@param objectB BaseObject
+---@section AABBCollision
+---@param object1 BaseObject
+---@param object2 BaseObject
 ---@return boolean
-function SimpleCollision(objectA, objectB)
-    local widthA, heightA, widthB, heightB = objectA.width, objectA.height, objectB.width, objectB.height
-    local positionA, positionB = objectA.position, objectB.position
+function AABBCollision(object1, object2)
+    local AABB1, AABB2, isColliding = object1:GetAABB(), object2:GetAABB(), false
 
-    local areColliding =
-    (
-        positionA.x < positionB.x + widthB and
-        positionA.x + widthA > positionB.x and
-        positionA.y < positionB.y + heightB and
-        positionA.y + heightA > positionB.y
+    isColliding = (
+        AABB1.maxX >= AABB2.minX and
+        AABB1.minX <= AABB2.maxX and
+        AABB1.maxY >= AABB2.minY and
+        AABB1.minY <= AABB2.maxY
     )
 
-    return areColliding
+    return isColliding
 end
 ---@endsection
 

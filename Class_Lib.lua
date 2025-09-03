@@ -71,7 +71,7 @@ BaseObject = {
     ---@param self BaseShape
     ---@param color table
     ---@param id number
-    SetColor = function (self, color, id)
+    SetColor = function(self, color, id)
         id = id or nil
         for _, shape in ipairs(self.shapes) do
             if id ~= nil then
@@ -85,7 +85,7 @@ BaseObject = {
     ---@section SetPosition
     ---@param self BaseShape
     ---@param vector LBVec
-    SetPosition = function (self, vector)
+    SetPosition = function(self, vector)
         self.position = vector
 
         for _, shape in ipairs(self.shapes) do
@@ -97,7 +97,7 @@ BaseObject = {
     ---@section SetRotation
     ---@param self BaseShape
     ---@param angle number
-    SetRotation = function (self, angle)
+    SetRotation = function(self, angle)
         self.rotation = angle
 
         for _, shape in ipairs(self.shapes) do
@@ -106,16 +106,44 @@ BaseObject = {
     end;
     ---@endsection
     
-    ---@endsection
     ---@section SetScale
     ---@param self BaseShape
     ---@param s number
-    SetScale = function (self, s)
+    SetScale = function(self, s)
         self.scale = s
         
         for _, shape in ipairs(self.shapes) do
             shape:SetScale(s)
         end
+    end;
+    ---@endsection
+    
+    ---@section GetAABB
+    ---@param self BaseObject
+    ---@return table
+    GetAABB = function(self)
+        local AABB = {
+            minX = self.position.x, maxX = self.position.x,
+            minY = self.position.y, maxY = self.position.y,
+            width = 0,
+            height = 0,
+            center = self.position
+        }
+
+        for _, shape in ipairs(self.shapes) do
+            local ShapeAABB = shape:GetAABB()
+
+            if ShapeAABB.minX < AABB.minX then AABB.minX = ShapeAABB.minX end
+            if ShapeAABB.maxX > AABB.maxX then AABB.maxX = ShapeAABB.maxX end
+            if ShapeAABB.minY < AABB.minY then AABB.minY = ShapeAABB.minY end
+            if ShapeAABB.maxY > AABB.maxY then AABB.maxY = ShapeAABB.maxY end
+        end
+
+        AABB.width = AABB.maxX - AABB.minX
+        AABB.height = AABB.maxY - AABB.minY
+        AABB.center = LifeBoatAPI.LBVec:new((AABB.minX+AABB.maxX)/2, (AABB.minY+AABB.maxY)/2)
+
+        return AABB
     end;
     ---@endsection
 
