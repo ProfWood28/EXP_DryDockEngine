@@ -234,7 +234,7 @@ PolygonCircle = function(polygon, circle)
     end
 
     -- Step 5: Orient axis from polygon → circle
-    local centerDelta = circle.position:lbvec_sub(polygon.vertices[1])
+    local centerDelta = circle.center:lbvec_sub(polygon.vertices[1])
     if centerDelta:lbvec_dot(mtvAxis) < 0 then
         mtvAxis = mtvAxis:lbvec_scale(-1)
     end
