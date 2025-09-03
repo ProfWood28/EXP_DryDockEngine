@@ -87,6 +87,10 @@ BaseObject = {
     ---@param vector LBVec
     SetPosition = function (self, vector)
         self.position = vector
+
+        for _, shape in ipairs(self.shapes) do
+            shape:SetPosition(vector)
+        end
     end;
     ---@endsection
     
@@ -95,6 +99,10 @@ BaseObject = {
     ---@param angle number
     SetRotation = function (self, angle)
         self.rotation = angle
+
+        for _, shape in ipairs(self.shapes) do
+            shape:SetRotation(angle)
+        end
     end;
     ---@endsection
     
@@ -104,6 +112,10 @@ BaseObject = {
     ---@param s number
     SetScale = function (self, s)
         self.scale = s
+        
+        for _, shape in ipairs(self.shapes) do
+            shape:SetScale(s)
+        end
     end;
     ---@endsection
 
