@@ -308,7 +308,11 @@ Circle = LifeBoatAPI.lb_copy(BaseShape, {
     ---@param self Circle
     Draw = function(self) 
         screen.setColor(self.color[1], self.color[2], self.color[3], self.color[4])
-        screen.drawCircle(self.position.x, self.position.y, self.radius * self.scale)
+        if self.doFill then
+            screen.drawCircleF(self.position.x, self.position.y, self.radius * self.scale)
+        else
+            screen.drawCircleF(self.position.x, self.position.y, self.radius * self.scale)
+        end
     end;
     ---@endsection
 })
