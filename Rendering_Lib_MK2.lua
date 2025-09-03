@@ -9,7 +9,6 @@ ShapeTypes = {
     Base = "BaseShape",
     Polygon = "Polygon",
     Circle = "Circle",
-    Triangle = "Triangle"
 }
 
 ---@section BaseShape 1 _BASESHAPE_
@@ -69,8 +68,13 @@ BaseShape = {
     ---@param self BaseShape
     ---@return table
     GetAABB = function(self)
-        return {minX=self.position.x, maxX=self.position.x,
-                minY=self.position.y, maxY=self.position.y}
+        return {
+            minX = self.position.x, maxX = self.position.x,
+            minY = self.position.y, maxY = self.position.y,
+            width = 0,
+            height = 0,
+            center = self.position
+        }
     end;
     ---@endsection
 
@@ -259,3 +263,53 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
     ---@endsection
 })
 ---@endsection _POLYGON_
+
+---@section Circle 1 _CIRCLE_
+---@class Circle
+---@field int id
+---@field position LBVec
+---@field rotation number
+---@field scale number
+---@field color table
+---@field type string
+---@field radius number
+Circle = LifeBoatAPI.lb_copy(BaseShape, {
+    ---@param self Circle
+    ---@param _position LBVec
+    ---@param _rotation number
+    ---@param _scale number
+    ---@param _radius number
+    ---@param _doFill boolean
+    ---@return Circle
+    new = function(self, _position, _rotation, _scale, _radius, _doFill)
+        local obj = BaseShape.new(self, _position, _rotation, _scale)
+        obj.radius = _radius
+        obj.doFill = _doFill
+        obj.type = ShapeTypes.Circle
+        return obj
+    end;
+    
+    ---@section GetAABB
+    ---@param self Circle
+    ---@return table
+    GetAABB = function(self)
+        local r, p = self.radius * self.scale, self.position
+        return {
+            minX = p.x - r, maxX = p.x + r,
+            minY = p.y - r, maxY = p.y + r,
+            width = 2 * r,
+            height = 2 * r,
+            center = p
+        }
+    end;
+    ---@endsection
+
+    ---@section Draw
+    ---@param self Circle
+    Draw = function(self) 
+        screen.setColor(self.color[1], self.color[2], self.color[3], self.color[4])
+        screen.drawCircle(self.position.x, self.position.y, self.radius * self.scale)
+    end;
+    ---@endsection
+})
+---@endsection _CIRCLE_
