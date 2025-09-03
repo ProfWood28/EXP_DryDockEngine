@@ -219,7 +219,7 @@ PolygonCircle = function(polygon, circle)
     local mtvAxis = nil
     for _, axis in ipairs(axes) do
         local minP, maxP = projectPolygon(polygon.vertices, axis)
-        local minC, maxC = projectCircle(circle.position, circle.radius, axis)
+        local minC, maxC = projectCircle(circle.center, circle.radius, axis)
 
         local overlap = math.min(maxP, maxC) - math.max(minP, minC)
         if overlap <= 0 then
