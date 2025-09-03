@@ -64,7 +64,7 @@ function AdvancedCollision(object1, object2)
                 depth, normal = PolygonCircle(shapeData1, shapeData2)
             elseif shapeData1.type == ShapeTypes.Circle and shapeData2.type == ShapeTypes.Polygon then
                 depth, normal = PolygonCircle(shapeData2, shapeData1)
-                if normal then normal = normal:lbvec_scale(-1) end  -- flip normal to maintain correct direction
+                if normal then normal = normal:lbvec_scale(-1) end
             elseif shapeData1.type == ShapeTypes.Circle and shapeData2.type == ShapeTypes.Circle then
                 depth, normal = CircleCircle(shapeData1, shapeData2)
             end
@@ -77,7 +77,6 @@ function AdvancedCollision(object1, object2)
     end
 
     if minPenDepth == math.huge then
-        -- no collision detected at all
         return 0, nil
     else
         return minPenDepth, collisionNormal
@@ -161,6 +160,81 @@ PolygonPolygon = function(p1, p2)
     centerB = centerB:lbvec_scale(1 / #p2.vertices)
     centerDelta = centerB:lbvec_sub(centerDelta)
 
+    if centerDelta:lbvec_dot(mtvAxis) < 0 then
+        mtvAxis = mtvAxis:lbvec_scale(-1)
+    end
+
+    return minOverlap, mtvAxis
+end
+---@endsection
+
+---@section PolygonCircle
+---@param polygon table
+---@param circle table
+---@return number, LBVec
+PolygonCircle = function(polygon, circle)
+    local axes = {}
+
+    -- Step 1: Polygon edge normals
+    for i = 1, #polygon.vertices do
+        local nextIdx = (i % #polygon.vertices) + 1
+        local edge = polygon.vertices[nextIdx]:lbvec_sub(polygon.vertices[i])
+        local axis = LifeBoatAPI.LBVec:new(-edge.y, edge.x):lbvec_normalize()
+        table.insert(axes, axis)
+    end
+
+    -- Step 2: Axis from closest polygon vertex to circle center
+    local closestVertex = polygon.vertices[1]
+    local minDist = circle.position:lbvec_sub(closestVertex):lbvec_length()
+    for i = 2, #polygon.vertices do
+        local dist = circle.position:lbvec_sub(polygon.vertices[i]):lbvec_length()
+        if dist < minDist then
+            minDist = dist
+            closestVertex = polygon.vertices[i]
+        end
+    end
+    local axisToCircle = circle.position:lbvec_sub(closestVertex)
+    if axisToCircle:lbvec_length() > 0 then
+        table.insert(axes, axisToCircle:lbvec_normalize())
+    end
+
+    -- Step 3: Projection helper
+    local function projectPolygon(vertices, axis)
+        local min, max = math.huge, -math.huge
+        for _, v in ipairs(vertices) do
+            local p = v:lbvec_dot(axis)
+            if p < min then min = p end
+            if p > max then max = p end
+        end
+        return min, max
+    end
+
+    local function projectCircle(center, radius, axis)
+        local p = center:lbvec_dot(axis)
+        return p - radius, p + radius
+    end
+
+    -- Step 4: Check overlaps
+    local minOverlap = math.huge
+    local mtvAxis = nil
+    for _, axis in ipairs(axes) do
+        local minP, maxP = projectPolygon(polygon.vertices, axis)
+        local minC, maxC = projectCircle(circle.position, circle.radius, axis)
+
+        local overlap = math.min(maxP, maxC) - math.max(minP, minC)
+        if overlap <= 0 then
+            -- Separating axis found → no collision
+            return 0, nil
+        end
+
+        if overlap < minOverlap then
+            minOverlap = overlap
+            mtvAxis = axis
+        end
+    end
+
+    -- Step 5: Orient axis from polygon → circle
+    local centerDelta = circle.position:lbvec_sub(polygon.vertices[1])
     if centerDelta:lbvec_dot(mtvAxis) < 0 then
         mtvAxis = mtvAxis:lbvec_scale(-1)
     end
