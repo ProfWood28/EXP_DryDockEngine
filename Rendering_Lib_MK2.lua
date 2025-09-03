@@ -77,6 +77,14 @@ BaseShape = {
         }
     end;
     ---@endsection
+    
+    ---@section GetWorldVertices
+    ---@param self BaseShape
+    ---@return table
+    GetWorldVertices = function(self)
+        return { type=self.type, vertices=nil }
+    end;
+    ---@endsection
 
     ---@section Draw
     ---@param self BaseShape
@@ -239,6 +247,14 @@ Polygon = LifeBoatAPI.lb_copy(BaseShape, {
         }
     end;
     ---@endsection
+    
+    ---@section GetWorldVertices
+    ---@param self Polygon
+    ---@return table
+    GetWorldVertices = function(self)
+        return { type=self.type, vertices=self.worldVertices }
+    end;
+    ---@endsection
 
     ---@section Draw
     ---@param self Polygon
@@ -301,6 +317,14 @@ Circle = LifeBoatAPI.lb_copy(BaseShape, {
             height = 2 * r,
             center = p
         }
+    end;
+    ---@endsection
+
+    ---@section GetWorldVertices
+    ---@param self Circle
+    ---@return table
+    GetWorldVertices = function(self)
+        return { type=self.type, center=self.position, radius=self.radius }
     end;
     ---@endsection
 

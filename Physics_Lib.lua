@@ -47,75 +47,126 @@ end
 ---@endsection
 
 ---@section AdvancedCollision
----@param shapeA BaseShape
----@param shapeB BaseShape
----@return LBVec, number
-function AdvancedCollision(shapeA, shapeB)
-    local penDepth, normal = 0, LifeBoatAPI.LBVec:new()
-    -- Type times
+---@param object1 BaseShape
+---@param object2 BaseShape
+---@return number, LBVec
+function AdvancedCollision(object1, object2)
+    local minPenDepth, collisionNormal = math.huge, nil
 
+    local object1Shapes, object2Shapes = object1:GetWorldVertices(), object2:GetWorldVertices()
 
+    for _, shapeData1 in ipairs(object1Shapes) do
+        for _, shapeData2 in ipairs(object2Shapes) do
+            local depth, normal
+            if shapeData1.type == ShapeTypes.Polygon and shapeData2.type == ShapeTypes.Polygon then
+                depth, normal = PolygonPolygon(shapeData1, shapeData2)
+            elseif shapeData1.type == ShapeTypes.Polygon and shapeData2.type == ShapeTypes.Circle then
+                depth, normal = PolygonCircle(shapeData1, shapeData2)
+            elseif shapeData1.type == ShapeTypes.Circle and shapeData2.type == ShapeTypes.Polygon then
+                depth, normal = PolygonCircle(shapeData2, shapeData1)
+                if normal then normal = normal:lbvec_scale(-1) end  -- flip normal to maintain correct direction
+            elseif shapeData1.type == ShapeTypes.Circle and shapeData2.type == ShapeTypes.Circle then
+                depth, normal = CircleCircle(shapeData1, shapeData2)
+            end
 
-    return normal, penDepth
-end
----@endsection
-
----@section CircleCircleCollision
----@param circleA CircleShape
----@param circleB CircleShape
----@return LBvec, number
-function CircleCircleCollision(circleA, circleB)
-    local maxDistance = circleA.radius + circleB.radius
-    local actualDistance = LifeBoatAPI.LBVec.lbvec_distance(circleA.position, circleB.position)
-    local angle = LifeBoatAPI.LBVec.lbvec_anglebetween(circleA.position, circleB.position)
-    
-    local deltaDistance = maxDistance-actualDistance
-    return deltaDistance > 0 and LifeBoatAPI.LBVec:new(math.cos(angle), math.sin(angle)) or nil, deltaDistance > 0 and  deltaDistance or nil
-end
----@endsection
-
----@section PolygonPolygonCollision
----@param polygonA BaseShape --These can also be a RotatedRectangle
----@param polygonB BaseShape
----@return LBVec, number
-function PolygonPolygonCollision(polygonA, polygonB)
-    -- The vertices of both types have a dedicated function
-    -- I am starting to think I should be directly modifying the vertices tbh
-    local verticesPolygonA, verticesPolygonB =  polygonA.type == "RotatedRectangle" and polygonA:GetRotatedCorners() or polygonA.type == "Polygon" and polygonA.GetRotatedVertices(),
-                                                polygonB.type == "RotatedRectangle" and polygonB:GetRotatedCorners() or polygonB.type == "Polygon" and polygonB.GetRotatedVertices()
-
-    -- The way RotatedRectangle is set up, it will always center on its position
-    local centroidPolygonA, centroidPolygonB =  polygonA.type == "RotatedRectangle" and polygonA.position or polygonA.type == "Polygon" and polygonA.GetCentroid(),
-                                                polygonB.type == "RotatedRectangle" and polygonB.position or polygonB.type == "Polygon" and polygonB.GetCentroid()
-    
-    -- This is temporarily going here, just to make something functional
-    -- Ideally this goes in the related class
-
-    -- Edges:
-        local edgesA, edgesB = {}, {}
-
-        for i = 1, #verticesPolygonA do
-            local j = (i % #verticesPolygonA) + 1 -- Wrap around
-            local edge = LifeBoatAPI.LBVec:new(verticesPolygonA[j].x - verticesPolygonA[i].x + polygonA.position.x, verticesPolygonA[j].y - verticesPolygonA[i].y + polygonA.position.y)
-            table.insert(edgesA, edge)
+            if depth > 0 and depth < minPenDepth then
+                minPenDepth = depth
+                collisionNormal = normal
+            end
         end
-        for i = 1, #verticesPolygonB do
-            local j = (i % #verticesPolygonB) + 1 -- Wrap around
-            local edge = LifeBoatAPI.LBVec:new(verticesPolygonB[j].x - verticesPolygonB[i].x + polygonB.position.x, verticesPolygonB[j].y - verticesPolygonB[i].y + polygonB.position.y)
-            table.insert(edgesB, edge)
-        end
+    end
 
-    -- Normals:
-
-    -- Check outwards-ness of normals
-
-    -- Projections
-
-    -- Check overlap projection
-
-    -- Final checks
-
-    -- Dont forget returns
-    return idk, idk
+    if minPenDepth == math.huge then
+        -- no collision detected at all
+        return 0, nil
+    else
+        return minPenDepth, collisionNormal
+    end
 end
 ---@endsection
+
+---@section CircleCircle
+---@param c1 table
+---@param c2 table
+---@return number, LBVec
+CircleCircle = function(c1, c2)
+    local delta = c2.center:lbvec_sub(c1.center)
+    local distSq, r = delta:lbvec_magnitudeSq(),c1.radius + c2.radius
+
+    if distSq >= r*r then
+        return 0, nil -- no collision
+    end
+
+    local dist = math.sqrt(distSq)
+    local penetration = r - dist
+    local normal = (dist > 0) and delta:lbvec_normalize() or LifeBoatAPI.LBVec:new(1,0)
+
+    return penetration, normal
+end
+---@endsection
+
+---@section PolygonPolygon
+---@param p1 table
+---@param p2 table
+---@return number, LBVec
+PolygonPolygon = function(p1, p2)
+    local axes = {}
+
+    local function addPerpEdges(poly)
+        for i = 1, #poly.vertices do
+            local nextIdx = (i % #poly.vertices) + 1
+            local edge = poly.vertices[nextIdx]:lbvec_sub(poly.vertices[i])
+            local axis = LifeBoatAPI.LBVec:new(-edge.y, edge.x):lbvec_normalize()
+            table.insert(axes, axis)
+        end
+    end
+
+    addPerpEdges(p1)
+    addPerpEdges(p2)
+
+    local minOverlap = math.huge
+    local mtvAxis = nil
+
+    local function projectPolygon(vertices, axis)
+        local min, max = math.huge, -math.huge
+        for _, v in ipairs(vertices) do
+            local p = v:lbvec_dot(axis)
+            if p < min then min = p end
+            if p > max then max = p end
+        end
+        return min, max
+    end
+
+    for _, axis in ipairs(axes) do
+        local minA, maxA = projectPolygon(p1.vertices, axis)
+        local minB, maxB = projectPolygon(p2.vertices, axis)
+
+        local overlap = math.min(maxA, maxB) - math.max(minA, minB)
+
+        if overlap <= 0 then
+            return 0, nil
+        end
+
+        if overlap < minOverlap then
+            minOverlap = overlap
+            mtvAxis = axis
+        end
+    end
+
+    local centerDelta = LifeBoatAPI.LBVec:new(0,0)
+    for _, v in ipairs(p1.vertices) do centerDelta = centerDelta:lbvec_add(v) end
+    centerDelta = centerDelta:lbvec_scale(1 / #p1.vertices)
+    local centerB = LifeBoatAPI.LBVec:new(0,0)
+    for _, v in ipairs(p2.vertices) do centerB = centerB:lbvec_add(v) end
+    centerB = centerB:lbvec_scale(1 / #p2.vertices)
+    centerDelta = centerB:lbvec_sub(centerDelta)
+
+    if centerDelta:lbvec_dot(mtvAxis) < 0 then
+        mtvAxis = mtvAxis:lbvec_scale(-1)
+    end
+
+    return minOverlap, mtvAxis
+end
+---@endsection
+
+

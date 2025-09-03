@@ -146,6 +146,20 @@ BaseObject = {
         return AABB
     end;
     ---@endsection
+    
+    ---@section GetWorldVertices
+    ---@param self BaseObject
+    ---@return table
+    GetWorldVertices = function(self)
+        local verticeTable = {}
+        
+        for _, shape in ipairs(self.shapes) do
+            table.insert(verticeTable, shape:GetWorldVertices())
+        end
+
+        return verticeTable
+    end;
+    ---@endsection
 
     ---@section GetForwards
     ---@param self BaseObject
