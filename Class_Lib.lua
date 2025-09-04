@@ -103,7 +103,7 @@ BaseObject = {
         id = id or nil
         for _, shape in ipairs(self.shapes) do
             if id ~= nil then
-                shape.color = (shape.id == id) and color
+                shape.color = (shape.id == id) and color or shape.color
             else
                 shape.color = color
             end
