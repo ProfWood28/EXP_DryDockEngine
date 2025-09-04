@@ -51,3 +51,22 @@ function RemoveFromTable(t, v)
     return id ~= nil
 end
 ---@endsection
+
+---@section RandomOnUnitRect
+---@return number, number
+function RandomOnUnitRect()
+    local r = math.random()
+    local x = math.min(1, math.max(0, math.abs((r * 4 - 0.5) % 4 - 2) - 0.5))
+    local y = math.min(1, math.max(0, math.abs((r * 4 + 0.5) % 4 - 2) - 0.5))
+    return x, y
+end
+---@endsection
+
+---@section RandomOnRect
+---@param position LBVec
+---@param dimensions LBVec
+function RandomOnRect(position, dimensions)
+    local rx, ry = RandomOnUnitRect()
+    return LifeBoatAPI.LBVec:new(position.x + rx * dimensions.x, position.y + ry * dimensions.y) 
+end
+---@endsection
