@@ -14,7 +14,7 @@ GameEngine = {
 
 ---@section AddGameObject
 function AddGameObject(gameObject)
-    gameObject.id = #GameEngine.GameObjects + 1 -- Assign a unique ID
+    gameObject.id = GameEngine.ticks -- Assign a unique ID
     table.insert(GameEngine.GameObjects, gameObject)
 end
 ---@endsection
