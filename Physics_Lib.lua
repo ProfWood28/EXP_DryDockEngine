@@ -92,7 +92,7 @@ end
 ---@return number, LBVec
 CircleCircle = function(c1, c2)
     local delta = c2.center:lbvec_sub(c1.center)
-    local distSq, r = delta:lbvec_magnitudeSq(),c1.radius + c2.radius
+    local distSq, r = delta:lbvec_length()*delta:lbvec_length(),c1.radius + c2.radius
 
     if distSq >= r*r then
         return 0, nil -- no collision
