@@ -68,7 +68,7 @@ function DrawGameObject(gameObject)
 end
 ---@endsection
 
----@section Update
+---@section DoUpdate
 function DoUpdate()
     HandleScheduledRemovals()
     
@@ -78,7 +78,7 @@ function DoUpdate()
 end
 ---@endsection
 
----@section Draw
+---@section DoDraw
 function DoDraw()
     GameEngine.screenWidth, GameEngine.screenHeight = screen.getWidth(), screen.getHeight()
 
@@ -120,7 +120,7 @@ function GetObjectsFromLayer(layer)
 end
 ---@endsection
 
----@section HandleCollisions
+---@section HandleSimpleCollisions
 function HandleSimpleCollisions()
     local allObjects = GameEngine.GameObjects
 
