@@ -70,11 +70,11 @@ end
 
 ---@section Update
 function DoUpdate()
+    HandleScheduledRemovals()
+    
     for _, obj in ipairs(GameEngine.GameObjects) do
         UpdateGameObject(obj)
     end
-
-    HandleScheduledRemovals()
 end
 ---@endsection
 
