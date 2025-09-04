@@ -32,10 +32,11 @@ end
 
 ---@section ScheduleRemoveGameObject
 function ScheduleRemoveGameObject(gameObject)
-    if not TableContainsValue(GameEngine.ScheduledRemovals, gameObject.id) then table.insert(GameEngine.ScheduledRemovals, gameObject.id) end
+    if not FindInTable(GameEngine.ScheduledRemovals, function(o) return o.id == gameObject.id end) then table.insert(GameEngine.ScheduledRemovals, gameObject) end
 end
 ---@endsection
 
+---@section HandleScheduledRemovals
 function HandleScheduledRemovals()
     local toRemove = {}
     for _, id in ipairs(GameEngine.ScheduledRemovals) do
@@ -50,8 +51,7 @@ function HandleScheduledRemovals()
     end
     GameEngine.ScheduledRemovals = {}
 end
-
-
+---@endsection
 
 ---@section UpdateGameObject
 function UpdateGameObject(gameObject)
