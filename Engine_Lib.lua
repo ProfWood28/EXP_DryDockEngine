@@ -39,8 +39,8 @@ end
 ---@section HandleScheduledRemovals
 function HandleScheduledRemovals()
     local toRemove = {}
-    for _, id in ipairs(GameEngine.ScheduledRemovals) do
-        local _, index = FindInTable(GameEngine.GameObjects, function(o) return o.id == id end)
+    for _, obj in ipairs(GameEngine.ScheduledRemovals) do
+        local _, index = FindInTable(GameEngine.GameObjects, function(o) return o.id == obj.id end)
         if index then
             table.insert(toRemove, index)
         end
