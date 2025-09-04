@@ -11,6 +11,7 @@ ObjectTypes = {
 ---@field name string
 ---@field id number
 ---@field shapes table
+---@field layers table
 ---@field type string
 BaseObject = {
     ---@param self BaseObject
@@ -28,6 +29,7 @@ BaseObject = {
             name = _name or "",
             id = nil, -- ID will be assigned by the engine
             shapes = {},
+            layers = {},
             type = ObjectTypes.Base,
         })
     end;
@@ -64,6 +66,32 @@ BaseObject = {
     ---@param shape BaseShape
     RemoveShape = function(self, shape)
         table.remove(self.shapes, shape.id)
+    end;
+    ---@endsection
+    
+    ---@section AddLayer
+    ---@param self BaseShape
+    ---@param layer string
+    AddLayer = function(self, layer)
+        local id = TableContainsValue(self.layers, layer)
+        if id then return end
+        table.insert(self.layers, layer)
+    end;
+    ---@endsection
+    
+    ---@section RemoveLayer
+    ---@param self BaseShape
+    ---@param layer string
+    RemoveLayer = function(self, layer)
+        RemoveFromTable(self.layers, layer)
+    end;
+    ---@endsection
+    
+    ---@section SetLayers
+    ---@param self BaseShape
+    ---@param layers table
+    SetLayers = function(self, layers)
+        self.layers = layers
     end;
     ---@endsection
     
@@ -203,19 +231,6 @@ PhysicsObject = LifeBoatAPI.lb_copy(BaseObject, {
         self.velocity = self.velocity:lbvec_add(acceleration:lbvec_scale(GameEngine.deltaTime))
         self.position = self.position:lbvec_add(self.velocity:lbvec_scale(GameEngine.deltaTime))
     end;
-    ---@endsection
-    
-    ---@section CollisionDetection
-    ---@param self PhysicsObject
-    ---@return number, PhysicsObject
-    CollisionDetection = function(self)
-        
-        -- Returns both the penetration depth and object it collided with
-        -- nil if no collision
-
-        -- TBA!!!
-        return nil, nil
-    end
     ---@endsection
 })
 ---@endsection _PHYSICSOBJECT_

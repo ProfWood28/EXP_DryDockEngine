@@ -64,12 +64,10 @@ end
 ---@param id number
 ---@return BaseObject
 function GetObjectFromID(id)
-    for _, obj in ipairs(GameEngine.GameObjects) do
-        if(obj.id == id) then 
-            return obj
-        end
-    end
-    return nil
+    local obj = FindInTable(GameEngine.GameObjects, function(o)
+        return o.id == id
+    end)
+    return obj
 end
 ---@endsection
 
@@ -77,12 +75,19 @@ end
 ---@param name string
 ---@return BaseObject
 function GetObjectFromName(name)
-    for _, obj in ipairs(GameEngine.GameObjects) do
-        if(obj.name == name) then 
-            return obj
-        end
-    end
-    return nil
+    local obj = FindInTable(GameEngine.GameObjects, function(o)
+        return o.name == name
+    end)
+    return obj
 end
 ---@endsection
 
+---@section GetObjectsFromLayer
+---@param layer string
+---@return table
+function GetObjectsFromLayer(layer)
+    return FindAllInTable(GameEngine.GameObjects, function(obj)
+        return TableContainsValue(obj.layers, layer) ~= nil
+    end)
+end
+---@endsection

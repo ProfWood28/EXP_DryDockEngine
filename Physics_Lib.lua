@@ -53,6 +53,8 @@ end
 function AdvancedCollision(object1, object2)
     local minPenDepth, collisionNormal = math.huge, nil
 
+    if not AABBCollision(object1, object2) then return minPenDepth, collisionNormal end
+
     local object1Shapes, object2Shapes = object1:GetWorldVertices(), object2:GetWorldVertices()
 
     for _, shapeData1 in ipairs(object1Shapes) do
