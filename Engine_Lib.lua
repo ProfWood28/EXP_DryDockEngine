@@ -20,7 +20,7 @@ end
 ---@section RemoveGameObject
 function RemoveGameObject(gameObject)
     for index, obj in ipairs(GameEngine.GameObjects) do
-        if obj.id == gameObject.id and gameObject.scheduleRemove then
+        if obj.id == gameObject.id then
             table.remove(GameEngine.GameObjects, index)
             break
         end
@@ -33,6 +33,18 @@ function ScheduleRemoveGameObject(gameObject)
     gameObject.scheduleRemove = true
 end
 ---@endsection
+
+---@section HandleScheduledRemovals
+function ScheduleRemoveGameObject()
+    for index, obj in ipairs(GameEngine.GameObjects) do
+        if obj.scheduleRemove then
+            table.remove(GameEngine.GameObjects, index)
+            break
+        end
+    end
+end
+---@endsection
+
 
 ---@section UpdateGameObject
 function UpdateGameObject(gameObject)
@@ -53,6 +65,8 @@ function DoUpdate()
     for _, obj in ipairs(GameEngine.GameObjects) do
         UpdateGameObject(obj)
     end
+
+    ScheduleRemoveGameObject()
 end
 ---@endsection
 
