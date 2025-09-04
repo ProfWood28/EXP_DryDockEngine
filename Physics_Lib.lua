@@ -57,18 +57,25 @@ function AdvancedCollision(object1, object2)
 
     local object1Shapes, object2Shapes = object1:GetWorldVertices(), object2:GetWorldVertices()
 
+    local depth, normal
     for _, shapeData1 in ipairs(object1Shapes) do
+        local type1 = shapeData1.type
         for _, shapeData2 in ipairs(object2Shapes) do
-            local depth, normal
-            if shapeData1.type == ShapeTypes.Polygon and shapeData2.type == ShapeTypes.Polygon then
-                depth, normal = PolygonPolygon(shapeData1, shapeData2)
-            elseif shapeData1.type == ShapeTypes.Polygon and shapeData2.type == ShapeTypes.Circle then
-                depth, normal = PolygonCircle(shapeData1, shapeData2)
-            elseif shapeData1.type == ShapeTypes.Circle and shapeData2.type == ShapeTypes.Polygon then
-                depth, normal = PolygonCircle(shapeData2, shapeData1)
-                if normal then normal = normal:lbvec_scale(-1) end
-            elseif shapeData1.type == ShapeTypes.Circle and shapeData2.type == ShapeTypes.Circle then
-                depth, normal = CircleCircle(shapeData1, shapeData2)
+            local type2 = shapeData2.type
+
+            if type1 == ShapeTypes.Polygon then
+                if type2 == ShapeTypes.Polygon then
+                    depth, normal = PolygonPolygon(shapeData1, shapeData2)
+                else -- Circle
+                    depth, normal = PolygonCircle(shapeData1, shapeData2)
+                end
+            else -- Circle
+                if type2 == ShapeTypes.Polygon then
+                    depth, normal = PolygonCircle(shapeData2, shapeData1)
+                    if normal then normal = normal:lbvec_scale(-1) end
+                else -- Circle vs Circle
+                    depth, normal = CircleCircle(shapeData1, shapeData2)
+                end
             end
 
             if depth > 0 and depth < minPenDepth then
@@ -77,6 +84,7 @@ function AdvancedCollision(object1, object2)
             end
         end
     end
+
 
     if minPenDepth == math.huge then
         return 0, nil
@@ -106,6 +114,18 @@ CircleCircle = function(c1, c2)
 end
 ---@endsection
 
+---@section projectPolygon 
+function projectPolygon(vertices, axis)
+    local min, max = math.huge, -math.huge
+    for _, v in ipairs(vertices) do
+        local p = v:lbvec_dot(axis)
+        if p < min then min = p end
+        if p > max then max = p end
+    end
+    return min, max
+end
+---@endsection
+
 ---@section PolygonPolygon
 ---@param p1 table
 ---@param p2 table
@@ -113,7 +133,7 @@ end
 PolygonPolygon = function(p1, p2)
     local axes = {}
 
-    local function addPerpEdges(poly)
+    function addPerpEdges(poly)
         for i = 1, #poly.vertices do
             local nextIdx = (i % #poly.vertices) + 1
             local edge = poly.vertices[nextIdx]:lbvec_sub(poly.vertices[i])
@@ -125,18 +145,7 @@ PolygonPolygon = function(p1, p2)
     addPerpEdges(p1)
     addPerpEdges(p2)
 
-    local minOverlap = math.huge
-    local mtvAxis = nil
-
-    local function projectPolygon(vertices, axis)
-        local min, max = math.huge, -math.huge
-        for _, v in ipairs(vertices) do
-            local p = v:lbvec_dot(axis)
-            if p < min then min = p end
-            if p > max then max = p end
-        end
-        return min, max
-    end
+    local minOverlap, mtvAxis = math.huge, nil
 
     for _, axis in ipairs(axes) do
         local minA, maxA = projectPolygon(p1.vertices, axis)
@@ -149,8 +158,7 @@ PolygonPolygon = function(p1, p2)
         end
 
         if overlap < minOverlap then
-            minOverlap = overlap
-            mtvAxis = axis
+            minOverlap, mtvAxis = overlap, axis
         end
     end
 
@@ -199,29 +207,12 @@ PolygonCircle = function(polygon, circle)
     if axisToCircle:lbvec_length() > 0 then
         table.insert(axes, axisToCircle:lbvec_normalize())
     end
-
-    -- Step 3: Projection helper
-    local function projectPolygon(vertices, axis)
-        local min, max = math.huge, -math.huge
-        for _, v in ipairs(vertices) do
-            local p = v:lbvec_dot(axis)
-            if p < min then min = p end
-            if p > max then max = p end
-        end
-        return min, max
-    end
-
-    local function projectCircle(center, radius, axis)
-        local p = center:lbvec_dot(axis)
-        return p - radius, p + radius
-    end
-
+    
     -- Step 4: Check overlaps
-    local minOverlap = math.huge
-    local mtvAxis = nil
+    local minOverlap, mtvAxis = math.huge, nil
     for _, axis in ipairs(axes) do
         local minP, maxP = projectPolygon(polygon.vertices, axis)
-        local minC, maxC = projectCircle(circle.center, circle.radius, axis)
+        local minC, maxC = circle.center:lbvec_dot(axis) - circle.radius, circle.center:lbvec_dot(axis) + circle.radius
 
         local overlap = math.min(maxP, maxC) - math.max(minP, minC)
         if overlap <= 0 then
@@ -230,8 +221,7 @@ PolygonCircle = function(polygon, circle)
         end
 
         if overlap < minOverlap then
-            minOverlap = overlap
-            mtvAxis = axis
+            minOverlap, mtvAxis = overlap, axis
         end
     end
 
@@ -244,5 +234,3 @@ PolygonCircle = function(polygon, circle)
     return minOverlap, mtvAxis
 end
 ---@endsection
-
-
