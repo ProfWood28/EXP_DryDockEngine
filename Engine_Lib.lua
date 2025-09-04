@@ -93,8 +93,9 @@ end
 ---@endsection
 
 ---@section HandleCollisions
----@param allObjects table -- list of all BaseObjects in the scene
-function HandleCollisions(allObjects)
+function HandleCollisions()
+    local allObjects = GameEngine.GameObjects
+
     for i = 1, #allObjects - 1 do
         for j = i + 1, #allObjects do
             local o1, o2 = allObjects[i], allObjects[j]
