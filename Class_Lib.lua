@@ -198,6 +198,15 @@ BaseObject = {
         return LifeBoatAPI.LBVec:new(math.cos(self.rotation + forwardsOffset), math.sin(self.rotation + forwardsOffset))
     end;
     ---@endsection
+    
+    ---@section OnCollision
+    ---@param self BaseObject
+    ---@param other BaseObject
+    ---@param depth number
+    ---@param normal LBVec
+    OnCollision = function(self, other, depth, normal) end;
+    ---@endsection
+
 
 }
 ---@endsection _BASEOBJECT_

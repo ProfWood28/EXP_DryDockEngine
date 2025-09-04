@@ -91,3 +91,41 @@ function GetObjectsFromLayer(layer)
     end)
 end
 ---@endsection
+
+---@section HandleCollisions
+---@param allObjects table -- list of all BaseObjects in the scene
+function HandleCollisions(allObjects)
+    for i = 1, #allObjects - 1 do
+        for j = i + 1, #allObjects do
+            local o1, o2 = allObjects[i], allObjects[j]
+
+            -- Skip if they share no layers
+            if not ShareLayer(o1.layers, o2.layers) then
+                goto continue
+            end
+
+            local depth, normal = AdvancedCollision(o1, o2)
+
+            if normal then
+                o1:OnCollision(o2, depth, normal)
+                o2:OnCollision(o1, depth, normal:lbvec_scale(-1))
+            end
+
+            ::continue::
+        end
+    end
+end
+---@endsection
+
+---@section ShareLayer
+function ShareLayer(layers1, layers2)
+    for _, l1 in ipairs(layers1) do
+        for _, l2 in ipairs(layers2) do
+            if l1 == l2 then
+                return true
+            end
+        end
+    end
+    return false
+end
+---@endsection
