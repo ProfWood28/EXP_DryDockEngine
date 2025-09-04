@@ -6,6 +6,7 @@ GameEngine = {
     deltaTime = 1 / 60,
     gravity = 9.81,
     GameObjects = {},
+    ScheduledRemovals = {},
     screenWidth = 0,
     screenHeight = 0,
 }
@@ -30,17 +31,14 @@ end
 
 ---@section ScheduleRemoveGameObject
 function ScheduleRemoveGameObject(gameObject)
-    gameObject.scheduleRemove = true
+    if not TableContainsValue(GameEngine.ScheduledRemovals, gameObject.id) then table.insert(GameEngine.ScheduledRemovals, gameObject.id) end
 end
 ---@endsection
 
 ---@section HandleScheduledRemovals
 function ScheduleRemoveGameObject()
-    for index, obj in ipairs(GameEngine.GameObjects) do
-        if obj.scheduleRemove then
-            table.remove(GameEngine.GameObjects, index)
-            break
-        end
+    for _, id in ipairs(GameEngine.ScheduledRemovals) do
+        table.remove(GameEngine.GameObjects, FindInTable(GameEngine.GameObjects, function(o) return o.id == id end))
     end
 end
 ---@endsection
