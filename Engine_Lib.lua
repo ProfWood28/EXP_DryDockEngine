@@ -9,6 +9,7 @@ GameEngine = {
     ScheduledRemovals = {},
     screenWidth = 0,
     screenHeight = 0,
+    ticks = 0,
 }
 
 ---@section AddGameObject
@@ -56,6 +57,7 @@ end
 function UpdateGameObject(gameObject)
     -- Call the Update method of the game object
     gameObject:Update()
+    GameEngine.ticks = GameEngine.ticks + 1
 end
 ---@endsection
 
