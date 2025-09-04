@@ -20,11 +20,17 @@ end
 ---@section RemoveGameObject
 function RemoveGameObject(gameObject)
     for index, obj in ipairs(GameEngine.GameObjects) do
-        if obj.id == gameObject.id then
+        if obj.id == gameObject.id and gameObject.scheduleRemove then
             table.remove(GameEngine.GameObjects, index)
             break
         end
     end
+end
+---@endsection
+
+---@section ScheduleRemoveGameObject
+function ScheduleRemoveGameObject(gameObject)
+    gameObject.scheduleRemove = true
 end
 ---@endsection
 
