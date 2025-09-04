@@ -35,13 +35,21 @@ function ScheduleRemoveGameObject(gameObject)
 end
 ---@endsection
 
----@section HandleScheduledRemovals
-function ScheduleRemoveGameObject()
+function HandleScheduledRemovals()
+    local toRemove = {}
     for _, id in ipairs(GameEngine.ScheduledRemovals) do
-        table.remove(GameEngine.GameObjects, FindInTable(GameEngine.GameObjects, function(o) return o.id == id end))
+        local _, index = FindInTable(GameEngine.GameObjects, function(o) return o.id == id end)
+        if index then
+            table.insert(toRemove, index)
+        end
     end
+    table.sort(toRemove, function(a,b) return a>b end)
+    for _, index in ipairs(toRemove) do
+        table.remove(GameEngine.GameObjects, index)
+    end
+    GameEngine.ScheduledRemovals = {}
 end
----@endsection
+
 
 
 ---@section UpdateGameObject
@@ -64,7 +72,7 @@ function DoUpdate()
         UpdateGameObject(obj)
     end
 
-    ScheduleRemoveGameObject()
+    HandleScheduledRemovals()
 end
 ---@endsection
 
