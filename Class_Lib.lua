@@ -193,7 +193,7 @@ BaseObject = {
     ---@param self BaseObject
     ---@param forwardsOffset number
     ---@return LBVec ForwardVector Returns the normalised forwards vector based on rotation and offset
-    getForwards = function(self, forwardsOffset)
+    GetForwards = function(self, forwardsOffset)
         forwardOffset = forwardOffset or 0
         return LifeBoatAPI.LBVec:new(math.cos(self.rotation + forwardsOffset), math.sin(self.rotation + forwardsOffset))
     end;
