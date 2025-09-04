@@ -121,6 +121,32 @@ end
 ---@endsection
 
 ---@section HandleCollisions
+function HandleSimpleCollisions()
+    local allObjects = GameEngine.GameObjects
+
+    for i = 1, #allObjects - 1 do
+        for j = i + 1, #allObjects do
+            local o1, o2 = allObjects[i], allObjects[j]
+
+            -- Skip if they share no layers
+            if not ShareLayer(o1.layers, o2.layers) then
+                goto continue
+            end
+
+            local hit = AABBCollision(o1, o2)
+
+            if hit then
+                o1:OnCollision(o2, 0, nil)
+                o2:OnCollision(o1, 0, nil)
+            end
+
+            ::continue::
+        end
+    end
+end
+---@endsection
+
+---@section HandleCollisions
 function HandleCollisions()
     local allObjects = GameEngine.GameObjects
 
