@@ -10,6 +10,7 @@ GameEngine = {
     screenWidth = 0,
     screenHeight = 0,
     ticks = 0,
+    nextId = 0
 }
 
 ---@section Classes
@@ -22,7 +23,8 @@ Prefabs = {}
 
 ---@section AddGameObject
 function AddGameObject(gameObject)
-    gameObject.id = GameEngine.ticks -- Assign a unique ID
+    GameEngine.nextId = GameEngine.nextId + 1
+    gameObject.id = GameEngine.nextId
     table.insert(GameEngine.GameObjects, gameObject)
 end
 ---@endsection
@@ -34,6 +36,14 @@ function RemoveGameObject(gameObject)
             table.remove(GameEngine.GameObjects, index)
             break
         end
+    end
+end
+---@endsection
+
+---@section RemoveAllGameObjects
+function RemoveAllGameObjects()
+    for i = #GameEngine.GameObjects, 1, -1 do
+        RemoveGameObject(GameEngine.GameObjects[i])
     end
 end
 ---@endsection
